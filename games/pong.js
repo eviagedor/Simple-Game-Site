@@ -89,7 +89,7 @@ window.onload = function () {
         update() {
             for (let key in keysPressed) {
                 let _key = Number(key); // convert the key to a number
-                
+
                 if (_key === 87) {
                     super.move(-5);
                 } else if (_key === 83) {
@@ -147,11 +147,12 @@ window.onload = function () {
          * @param {int} x the x coordinate 
          * @param {int} y the y coordinate
          */
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.x_velocity = 0;
-            this.y_velocity = 5;
+        constructor() {
+            this.x = canvas.width / 2;
+            this.y = canvas.height / 2;
+            this.radius = 6;
+            this.x_velocity = 3;
+            this.y_velocity = 3;
         }
 
         /**
@@ -159,39 +160,61 @@ window.onload = function () {
          */
         render() {
             context.beginPath();
-            context.arc(this.x, this.y, 5, 2 * Math.PI, false);
+            context.arc(this.x, this.y, this.radius, 2 * Math.PI, false);
             context.fillStyle = "#ffffff";
             context.fill();
         }
 
-        update() {
-            
+        /**
+         * Checks if the puck collides with any walls or paddles
+         * @param {Paddle} p1 player 1
+         * @param {Paddle} p2 player 2
+         */
+        update(p1, p2) {
+            this.clearPuck();
+
+            if (this.y < this.radius || this.y > canvas.height - this.radius) { // collide with top or bottom?
+                this.y_velocity *= -1;
+            }
+
+            if (this.x < 0 || this.x > canvas.width) { // beyond each paddle?
+                this.clearPuck();
+                this.resetPuck();
+            }
+
+            if (this.x < (p1.x + p1.width) && this.y < (p1.y + p1.height)
+                && p1.x < (this.x + this.radius) && p1.y < (this.y + this.radius)) { // collide with player 1 (left paddle)?
+                this.x_velocity *= -1;
+            }
+
+            if (this.x < (p2.x + p2.width) && this.y < (p2.y + p2.height)
+                && p2.x < (this.x + this.radius) && p2.y < (this.y + this.radius)) { // collide with player 2 (right paddle)?
+                this.x_velocity *= -1;
+            }
+
+            this.x += this.x_velocity;
+            this.y += this.y_velocity;
+        }
+
+        /**
+         * Clear the circle from canvas
+         */
+        clearPuck() {
+            context.clearRect(0, 0, canvas.width, canvas.height); // clear the circle for redraw
+        }
+
+        /**
+         * Reinitialize starting x & y of the Puck
+         */
+        resetPuck() {
+            this.x = canvas.width / 2;
+            this.y = canvas.height / 2;
         }
     }
 
-    let player1 = new Player1(15, 40, PADDLE_WIDTH, PADDLE_HEIGHT, 0);
-    let player2 = new Player2((canvas.width - PADDLE_WIDTH) - 15, 200, PADDLE_WIDTH, PADDLE_HEIGHT, 10);
-    let puck = new Puck(canvas.width / 2, canvas.height / 2);
-
-    function update() {
-        player1.update();
-        player2.update();
-    }
-
-    function render() {
-        player1.render();
-        player2.render();
-        puck.render();
-    }
-
-    /**
-     * Performs a "game loop" with the constant calls from requestAnimationFrame
-     */
-    function show() {
-        update();
-        render();
-        window.requestAnimationFrame(show);
-    };
+    let player1 = new Player1(15, canvas.height / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 0);
+    let player2 = new Player2((canvas.width - PADDLE_WIDTH) - 15, canvas.height / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 10);
+    let puck = new Puck();
 
     window.requestAnimationFrame(show);
 
@@ -204,4 +227,33 @@ window.onload = function () {
     window.addEventListener("keyup", function (e) {
         delete keysPressed[e.keyCode]; // remove the key from being a pressed key
     }, false);
+
+   /**
+     * Performs a "game loop" with the constant calls from requestAnimationFrame
+     */
+    function show() {
+        update();
+        render();
+        window.requestAnimationFrame(show);
+    };
+
+    /**
+     * Updates the coordinates of each object on the canvas
+     */
+    function update() {
+        player1.update();
+        player2.update();
+        puck.update(player1, player2);
+    }
+
+    /**
+     * Draws each object on the canvas
+     */
+    function render() {
+        player1.render();
+        player2.render();
+        puck.render();
+    }
+
+    
 }

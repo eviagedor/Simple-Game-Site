@@ -1,3 +1,2 @@
-- Add movement to puck (update function in class)
 - Add scores
 - Add game end
