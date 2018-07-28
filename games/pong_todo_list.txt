@@ -1,2 +1,2 @@
-- Add scores
 - Add game end
+- Add vector direction for puck 

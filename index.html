@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 
 <head>
@@ -8,6 +7,7 @@
         Welcome to the game page!
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Nova Square' rel='stylesheet'>
     <!--<link rel="stylesheet" type="text/css" media="screen" href="main.css" />-->
     <script src="games/pong.js"></script>
     <style>
@@ -21,11 +21,36 @@
             border: 1px solid #000000;
             background-color: #000000;
         }
+        
+        #p1score {
+            font-family: 'Nova Square';
+            font-size: 50px;
+            font-weight: bold;
+            position: absolute;
+            margin: 0 auto;
+            top: 100px;
+            right: 65%;
+            text-align: center;
+        }
+
+        #p2score {
+            font-family: 'Nova Square';
+            font-size: 50px;
+            font-weight: bold;
+            position: absolute;
+            margin: 0 auto;
+            top: 100px;
+            left: 65%;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
     <canvas id="canvas" width="600" height="300"></canvas>
+
+    <div id="p1score">0</div>
+    <div id="p2score">0</div>
 </body>
 
 </html>

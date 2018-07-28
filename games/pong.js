@@ -8,10 +8,12 @@
 window.onload = function () {
     "use strict";
 
-    const PADDLE_WIDTH = 10, PADDLE_HEIGHT = 65;
+    const PADDLE_WIDTH = 10,
+        PADDLE_HEIGHT = 65;
     let canvas = document.getElementById("canvas");
-    let context = canvas.getContext('2d');
-    let keysPressed = {}; // checks if a key is being held down or released; (https://stackoverflow.com/questions/1828613/check-if-a-key-is-down; answered by Robert)
+    let context = canvas.getContext("2d");
+    let keysPressed = {}; // checks if a key is being held down or released; 
+    // (https://stackoverflow.com/questions/1828613/check-if-a-key-is-down; answered by Robert)
 
     /**
      * Paddle object
@@ -61,7 +63,7 @@ window.onload = function () {
     }
 
     /**
-     * Player1's Paddle
+     * Player1"s Paddle
      */
     class Player1 extends Paddle {
         /**
@@ -71,9 +73,11 @@ window.onload = function () {
          * @param {int} width 
          * @param {int} height 
          * @param {int} y_velocity 
+         * @param {int} score
          */
         constructor(x, y, width, height, y_velocity) {
             super(x, y, width, height, y_velocity);
+            this.score = 0;
         }
 
         /**
@@ -97,10 +101,17 @@ window.onload = function () {
                 }
             }
         }
+
+        /**
+         * Returns the current score
+         */
+        addScore() {
+            return ++this.score;
+        }
     }
 
     /**
-     * Player2's Paddle
+     * Player2"s Paddle
      */
     class Player2 extends Paddle {
         /**
@@ -110,9 +121,11 @@ window.onload = function () {
          * @param {int} width 
          * @param {int} height 
          * @param {int} y_velocity 
+         * @param {int} score
          */
         constructor(x, y, width, height, y_velocity) {
             super(x, y, width, height, y_velocity);
+            this.score = 0;
         }
 
         /**
@@ -135,6 +148,13 @@ window.onload = function () {
                     super.move(5);
                 }
             }
+        }
+
+        /**
+         * Returns the current score
+         */
+        addScore() {
+            return ++this.score;
         }
     }
 
@@ -171,24 +191,32 @@ window.onload = function () {
          * @param {Paddle} p2 player 2
          */
         update(p1, p2) {
+            let p1score = document.getElementById("p1score");
+            let p2score = document.getElementById("p2score");
+
             this.clearPuck();
 
             if (this.y < this.radius || this.y > canvas.height - this.radius) { // collide with top or bottom?
                 this.y_velocity *= -1;
             }
 
-            if (this.x < 0 || this.x > canvas.width) { // beyond each paddle?
+            if (this.x < 0) { // scored on player1?
                 this.clearPuck();
                 this.resetPuck();
+                p2score.innerHTML = p2.addScore();
+            } else if (this.x > canvas.width) { // scored on player2?
+                this.clearPuck();
+                this.resetPuck();
+                p1score.innerHTML = p1.addScore();
             }
 
-            if (this.x < (p1.x + p1.width) && this.y < (p1.y + p1.height)
-                && p1.x < (this.x + this.radius) && p1.y < (this.y + this.radius)) { // collide with player 1 (left paddle)?
+            if (this.x < (p1.x + p1.width) && this.y < (p1.y + p1.height) &&
+                p1.x < (this.x + this.radius) && p1.y < (this.y + this.radius)) { // collide with player 1 (left paddle)?
                 this.x_velocity *= -1;
             }
 
-            if (this.x < (p2.x + p2.width) && this.y < (p2.y + p2.height)
-                && p2.x < (this.x + this.radius) && p2.y < (this.y + this.radius)) { // collide with player 2 (right paddle)?
+            if (this.x < (p2.x + p2.width) && this.y < (p2.y + p2.height) &&
+                p2.x < (this.x + this.radius) && p2.y < (this.y + this.radius)) { // collide with player 2 (right paddle)?
                 this.x_velocity *= -1;
             }
 
@@ -228,14 +256,14 @@ window.onload = function () {
         delete keysPressed[e.keyCode]; // remove the key from being a pressed key
     }, false);
 
-   /**
+    /**
      * Performs a "game loop" with the constant calls from requestAnimationFrame
      */
     function show() {
         update();
         render();
         window.requestAnimationFrame(show);
-    };
+    }
 
     /**
      * Updates the coordinates of each object on the canvas
@@ -254,6 +282,4 @@ window.onload = function () {
         player2.render();
         puck.render();
     }
-
-    
 }
